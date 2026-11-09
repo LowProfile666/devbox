@@ -1,0 +1,46 @@
+# 发布工作流：推 v* 标签时自动打包并创建 GitHub Release，
+# 安装包（exe）由 tauri-action 上传到 Release 的 Assets。
+# 手动触发：Actions 页面 Run workflow（版本号取 tauri.conf.json）。
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      # tauri-action 创建 Release / 上传产物需要写权限
+      contents: write
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # 缓存 Rust 编译产物：首次全量编译约 10 分钟，之后增量几分钟
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build and create release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # __VERSION__ 会被替换为 tauri.conf.json 里的版本号
+          tagName: ${{ github.ref_name }}
+          releaseName: 'DevBox v__VERSION__'
+          releaseBody: '见下方 Assets 下载安装包；更新内容见提交记录。'
+          releaseDraft: false
+          prerelease: false

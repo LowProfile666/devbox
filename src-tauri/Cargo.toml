@@ -1,0 +1,40 @@
+[package]
+name = "devbox-app"
+version = "0.1.0"
+description = "开发百宝箱桌面版"
+authors = ["咖啡八杯"]
+edition = "2021"
+rust-version = "1.90"
+
+[lib]
+# Tauri 官方模板的约定：业务代码放 lib，main.rs 只做入口，方便以后接移动端
+name = "devbox_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# tray-icon：托盘图标；image-png：用 PNG 做托盘/窗口图标
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-global-shortcut = "2"
+# autostart：开机自启开关
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# enigo：模拟键盘输入，「复制并粘贴」动作靠它发一次 Ctrl+V
+enigo = "0.2"
+# rfd：原生文件夹选择对话框，用于自定义数据存放目录
+rfd = "0.15"
+
+[target.'cfg(windows)'.dependencies]
+# windows-sys：粘贴前用 GetAsyncKeyState 等用户松开物理修饰键
+windows-sys = { version = "0.59", features = ["Win32_UI_Input_KeyboardAndMouse"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

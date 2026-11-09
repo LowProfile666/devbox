@@ -1,0 +1,124 @@
+/**
+ * 桌面版的统一主题变量 —— 本项目的「样式规范」唯一出处。
+ *
+ * 使用约定（新增/修改工具组件样式时必须遵守）：
+ *  1. 组件样式一律引用下面的变量，禁止写死明暗色值（hex 只允许出现在：
+ *     语法高亮调色板、Element Plus 状态色 #f56c6c/#67c23a/#e6a23c、rgba 色调）
+ *  2. 文字层级：正文 --text-primary，辅助/说明文字 --text-secondary
+ *  3. 强调色（链接、选中、悬停高亮）一律 --app-accent，明暗两套自动适配
+ *  4. 面板/卡片：容器 --bg-card，标题条 --bg-title，悬停反馈 --bg-hover，
+ *     页面级底色 --bg-main；边框一律 --border-color
+ *  5. 变量禁止带兜底值（var(--x, #fff)）：兜底会让暗色模式悄悄退化成浅色，
+ *     两套主题的取值统一在这里维护
+ *  6. 代码规范：组件结构统一「script setup + template + scoped style」，
+ *     复用逻辑提取到 src/toolbox/（如 quickActions / qrcodeQuick / enterBus），
+ *     系统能力一律经 src/host/index.ts 封装，组件不直接 import Tauri API
+ *
+ * 为什么用 CSS 变量而不是写死颜色：工具组件是从插件版搬来的，这里把变量补齐，
+ * 搬来的组件不用改一行就能适配明暗两套主题。
+ */
+:root {
+  --text-primary: #1f2329;
+  --text-secondary: #86909c;
+  --border-color: #e5e6eb;
+  --sidebar-bg: #f7f8fa;
+  --hover-bg: #eff0f3;
+  --active-bg: #e8ecf8;
+
+  /* 工具组件里 var(--bg-*, 兜底色) 用的变量：必须在这里补齐，
+     否则暗色模式下会退回兜底的浅色，出现白块 */
+  --bg-card: #ffffff;
+  --bg-title: #fafafa;
+  --bg-hover: #f5f7ff;
+  --bg-main: #f7f8fa;
+
+  --app-bg: #ffffff;
+  --app-bg-soft: #f7f8fa;
+  --app-border: #e5e6eb;
+  --app-text: #1f2329;
+  --app-text-soft: #86909c;
+  --app-hover: #eff0f3;
+  --app-active: #e8ecf8;
+  --app-accent: #667eea;
+  --app-titlebar: #f7f8fa;
+}
+
+/* 深色：由 html.dark 类驱动（跟随系统时由 theme.ts 自动加类），不用媒体查询——
+   否则用户手动切主题时样式不会跟。 */
+html.dark {
+  --text-primary: #d0d3d9;
+  --text-secondary: #808690;
+  --border-color: #3a3b3f;
+  --sidebar-bg: #26272b;
+  --hover-bg: #323337;
+  --active-bg: #35384a;
+
+  --bg-card: #26272b;
+  --bg-title: #2c2d31;
+  --bg-hover: #323337;
+  --bg-main: #1e1f22;
+
+  --app-bg: #1e1f22;
+  --app-bg-soft: #26272b;
+  --app-border: #3a3b3f;
+  --app-text: #d0d3d9;
+  --app-text-soft: #808690;
+  --app-hover: #323337;
+  --app-active: #35384a;
+  --app-accent: #8ba4f7;
+  --app-titlebar: #26272b;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+/* 桌面应用不应该像网页那样到处能选中文字：默认禁选，输入区域恢复 */
+body {
+  user-select: none;
+  cursor: default;
+}
+
+input,
+textarea,
+[contenteditable='true'],
+.cm-editor {
+  user-select: text;
+}
+
+textarea {
+  display: block;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--app-text-soft) 40%, transparent);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--app-text-soft) 65%, transparent);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
