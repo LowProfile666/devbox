@@ -3,6 +3,8 @@ dist
 src-tauri/target
 src-tauri/gen
 .tmp
+.tmp-vite
 *.local
 .DS_Store
 .workbuddy
+generated-images
